@@ -20,7 +20,7 @@ def lambda_handler(event, context):
 
     # Prepare the key for DynamoDB
     key = {
-        'location_id': {'S': key_value}
+        'GSI_location_id': {'S': key_value}
     }
 
     # Get the item from the table
