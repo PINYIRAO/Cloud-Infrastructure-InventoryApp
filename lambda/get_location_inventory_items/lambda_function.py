@@ -9,14 +9,14 @@ def lambda_handler(event, context):
     # Get the table name from environment variable
     table_name = os.getenv('TABLE_NAME', 'Inventory')
 
-    # Get the key from the query parameters
-    if 'queryStringParameters' not in event or 'location_id' not in event['queryStringParameters']:
+    # Get the key from the path parameters
+    if 'pathParameters' not in event or 'id' not in event['pathParameters']:
         return {
             'statusCode': 400,
-            'body': json.dumps("Missing 'id' query parameter")
+            'body': json.dumps("Missing 'id' path parameter")
         }
 
-    key_value = event['queryStringParameters']['location_id']
+    key_value = event['pathParameters']['id']
 
     # Prepare the key for DynamoDB
     key = {

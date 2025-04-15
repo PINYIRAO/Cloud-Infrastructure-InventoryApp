@@ -3,11 +3,12 @@ import boto3
 import uuid
 import os
 from ulid import ULID
+from decimal import Decimal
 
 def lambda_handler(event, context):
     # Parse incoming JSON data
     try:
-        data = json.loads(event['body'])
+        data = json.loads(event['body'], parse_float=Decimal)
     except KeyError:
         return {
             'statusCode': 400,

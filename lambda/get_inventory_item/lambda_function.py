@@ -1,13 +1,14 @@
 import boto3
 import json
 import os
+from boto3.dynamodb.conditions import Key
 
 def lambda_handler(event, context):
-    # DynamoDB setup
-    dynamo_client = boto3.client('dynamodb')
 
     # Get the table name from environment variable
     table_name = os.getenv('TABLE_NAME', 'Inventory')
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table(table_name)
 
     # Get the key from the path parameters
     if 'pathParameters' not in event or 'id' not in event['pathParameters']:
@@ -18,15 +19,12 @@ def lambda_handler(event, context):
 
     key_value = event['pathParameters']['id']
 
-    # Prepare the key for DynamoDB
-    key = {
-        'id': {'S': key_value}
-    }
-
     # Get the item from the table
     try:
-        response = dynamo_client.get_item(TableName=table_name, Key=key)
-        item = response.get('Item', {})
+
+        response = table.query(KeyConditionExpression=Key("id").eq(key_value))
+
+        item = response.get('Items', {})
 
         if not item:
             return {
