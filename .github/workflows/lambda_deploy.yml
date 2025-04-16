@@ -52,7 +52,7 @@ jobs:
             path: lambda/delete_inventory_item
           - name: get_location_inventory_items
             path: lambda/get_location_inventory_items
-    if: needs.check-changes.outputs[matrix.function.name] == 'true'
+    if: ${{ needs.check-changes.outputs[matrix.function.name] == 'true' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
