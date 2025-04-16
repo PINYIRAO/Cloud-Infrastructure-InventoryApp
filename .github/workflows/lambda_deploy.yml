@@ -1,0 +1,80 @@
+name: Deploy Python functions to AWS Lambda
+
+on:
+  push:
+    branches:
+      - "main"
+      - "development"
+
+jobs:
+  check-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      get_all_inventory_items: ${{ steps.filter.outputs.get_all_inventory_items }}
+      get_inventory_item: ${{ steps.filter.outputs.get_inventory_item }}
+      add_inventory_item: ${{ steps.filter.outputs.add_inventory_item }}
+      delete_inventory_item: ${{ steps.filter.outputs.delete_inventory_item }}
+      get_location_inventory_items: ${{ steps.filter.outputs.get_location_inventory_items }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check which Lambda functions changed
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            get_all_inventory_items:
+              - 'lambda/get_all_inventory_items/**'
+            get_inventory_item:
+              - 'lambda/get_inventory_item/**'
+            add_inventory_item:
+              - 'lambda/add_inventory_item/**'
+            delete_inventory_item:
+              - 'lambda/delete_inventory_item/**'
+            get_location_inventory_items:
+              - 'lambda/get_location_inventory_items/**'
+
+  deploy:
+    needs: check-changes
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        function:
+          - name: get_all_inventory_items
+            path: lambda/get_all_inventory_items
+          - name: get_inventory_item
+            path: lambda/get_inventory_item
+          - name: add_inventory_item
+            path: lambda/add_inventory_item
+          - name: delete_inventory_item
+            path: lambda/delete_inventory_item
+          - name: get_location_inventory_items
+            path: lambda/get_location_inventory_items
+    if: needs.check-changes.outputs[matrix.function.name] == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: us-east-1
+
+      - name: Zip Lambda function
+        run: |
+          cd ${{ matrix.function.path }}
+          zip -r ../../${{ matrix.function.name }}.zip .
+
+      - name: Update Lambda function on AWS
+        run: |
+          aws lambda update-function-code \
+            --function-name ${{ matrix.function.name }} \
+            --zip-file fileb://./${{ matrix.function.name }}.zip \
+            --publish
+
+      - name: Cleanup zip file
+        run: rm ${{ matrix.function.name }}.zip
