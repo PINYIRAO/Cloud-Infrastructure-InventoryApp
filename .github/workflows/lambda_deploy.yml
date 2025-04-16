@@ -6,12 +6,11 @@ on:
       - "main"
       - "development"
     paths:
-      - "lambda/get_all_inventory_items/lambda_function.py"
-        "lambda/get_inventory_item/lambda_function.py"
-        "lambda/add_inventory_item/lambda_function.py"
-        "lambda/delete_inventory_item/lambda_function.py"
-        "lambda/get_location_inventory_items/lambda_function.py"
-
+      - "lambda/get_all_inventory_items/**/*"
+      - "lambda/get_inventory_item/**/*"
+      - "lambda/add_inventory_item/**/*"
+      - "lambda/delete_inventory_item/**/*"
+      - "lambda/get_location_inventory_items/**/*"
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -26,11 +25,15 @@ jobs:
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           aws-region: us-east-1
       - name: Zip the get_all_inventory_items Lambda function
-        run: zip function.zip lambda_function.py
-        working-directory: ./lambda/get_all_inventory_items
+        if: contains(github.event.head_commit.modified, 'lambda/get_all_inventory_items')
+        run: |
+          cd lambda/get_all_inventory_items
+          zip -r function.zip .
       - name: Update Lambda function code
-        run: aws lambda update-function-code --function-name get_all_inventory_items --zip-file fileb://function.zip --publish
-        working-directory: ./lambda/get_all_inventory_items
+        run: |
+          cd lambda/get_all_inventory_items
+          aws lambda update-function-code --function-name get_all_inventory_items --zip-file fileb://function.zip --publish
       - name: Cleanup get_all_inventory_items zip
-        run: rm function.zip
-        working-directory: ./lambda/get_all_inventory_items
+        run: |
+          cd lambda/get_all_inventory_items
+          rm function.zip
