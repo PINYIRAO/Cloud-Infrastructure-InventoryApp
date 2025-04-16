@@ -4,23 +4,18 @@ name: Deploy Python functions to AWS Lambda
 on:
   push:
     branches:
-      - "main"
-      - "development"
+      - main
+      - development
 
 jobs:
   check-changes:
     runs-on: ubuntu-latest
     outputs:
-      get_all_inventory_items: >-
-        ${{ steps.filter.outputs.get_all_inventory_items }}
-      get_inventory_item: >-
-        ${{ steps.filter.outputs.get_inventory_item }}
-      add_inventory_item: >-
-        ${{ steps.filter.outputs.add_inventory_item }}
-      delete_inventory_item: >-
-        ${{ steps.filter.outputs.delete_inventory_item }}
-      get_location_inventory_items: >-
-        ${{ steps.filter.outputs.get_location_inventory_items }}
+      get_all_inventory_items: ${{ steps.filter.outputs.get_all_inventory_items }}
+      get_inventory_item: ${{ steps.filter.outputs.get_inventory_item }}
+      add_inventory_item: ${{ steps.filter.outputs.add_inventory_item }}
+      delete_inventory_item: ${{ steps.filter.outputs.delete_inventory_item }}
+      get_location_inventory_items: ${{ steps.filter.outputs.get_location_inventory_items }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -31,15 +26,15 @@ jobs:
         with:
           filters: |
             get_all_inventory_items:
-              - 'lambda/get_all_inventory_items/**'
+              - lambda/get_all_inventory_items/**
             get_inventory_item:
-              - 'lambda/get_inventory_item/**'
+              - lambda/get_inventory_item/**
             add_inventory_item:
-              - 'lambda/add_inventory_item/**'
+              - lambda/add_inventory_item/**
             delete_inventory_item:
-              - 'lambda/delete_inventory_item/**'
+              - lambda/delete_inventory_item/**
             get_location_inventory_items:
-              - 'lambda/get_location_inventory_items/**'
+              - lambda/get_location_inventory_items/**
 
   deploy:
     needs: check-changes
@@ -57,6 +52,7 @@ jobs:
             path: lambda/delete_inventory_item
           - name: get_location_inventory_items
             path: lambda/get_location_inventory_items
+    if: needs.check-changes.outputs[matrix.function.name] == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -73,3 +69,16 @@ jobs:
         run: |
           cd ${{ matrix.function.path }}
           zip -r ../../${{ matrix.function.name }}.zip .
+
+      - name: Update Lambda function on AWS
+        run: |
+          cd ${{ matrix.function.path }}
+          aws lambda update-function-code \
+            --function-name ${{ matrix.function.name }} \
+            --zip-file fileb://./${{ matrix.function.name }}.zip \
+            --publish
+
+      - name: Cleanup zip file
+        run: |
+          cd ${{ matrix.function.path }}
+          rm ${{ matrix.function.name }}.zip
