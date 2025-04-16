@@ -57,8 +57,6 @@ jobs:
             path: lambda/delete_inventory_item
           - name: get_location_inventory_items
             path: lambda/get_location_inventory_items
-    if: >-
-      needs.check-changes.outputs[matrix.function.name] == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -75,13 +73,3 @@ jobs:
         run: |
           cd ${{ matrix.function.path }}
           zip -r ../../${{ matrix.function.name }}.zip .
-
-      - name: Update Lambda function on AWS
-        run: |
-          aws lambda update-function-code \
-            --function-name ${{ matrix.function.name }} \
-            --zip-file fileb://./${{ matrix.function.name }}.zip \
-            --publish
-
-      - name: Cleanup zip file
-        run: rm ${{ matrix.function.name }}.zip

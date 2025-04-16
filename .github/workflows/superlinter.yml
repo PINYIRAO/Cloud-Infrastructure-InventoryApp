@@ -6,8 +6,6 @@ on:
     types: [opened, reopened]
     paths:
       - "**/*"
-    paths-ignore:
-      - "**/template.yaml"
 
 permissions: {}
 
