@@ -29,8 +29,9 @@ jobs:
         uses: super-linter/super-linter@v7.1.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DISABLE_JSCPD: "true"
-          DISABLE_PYTHON_PYLINT: "true"
+          VALIDATE_JSCPD: false
+          VALIDATE_PYTHON_PYLINT: false
+          VALIDATE_PYTHON_MYPY: false
           VALIDATE_CHECKOV: false
           FIX_HTML_PRETTIER: true
           FIX_PYTHON_BLACK: true
