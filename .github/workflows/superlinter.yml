@@ -4,7 +4,11 @@ name: Super-Linter
 on:
   pull_request:
     types: [opened, reopened]
-  
+    paths:
+      - "**/*"
+    paths-ignore:
+      - "**/template.yaml"
+
 permissions: {}
 
 jobs:
