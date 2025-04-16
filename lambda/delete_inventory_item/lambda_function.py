@@ -1,6 +1,7 @@
 import boto3
 import json
 import os
+from boto3.dynamodb.conditions import Key
 
 def lambda_handler(event, context):
     # Initialize DynamoDB client
@@ -8,6 +9,8 @@ def lambda_handler(event, context):
 
     # Get the table name from environment variable
     table_name = os.getenv('TABLE_NAME', 'Inventory')
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table(table_name)
 
     # Extract the '_id' from the path parameters
     if 'pathParameters' not in event or 'id' not in event['pathParameters']:
@@ -18,14 +21,15 @@ def lambda_handler(event, context):
 
     key_value = event['pathParameters']['id']
 
-    # Prepare the key for DynamoDB
-    key = {
-        '_id': {'S': key_value}
-    }
 
     # Attempt to delete the item from the table
     try:
-        dynamo_client.delete_item(TableName=table_name, Key=key)
+        response = table.query(KeyConditionExpression=Key("id").eq(key_value))
+        for item in response['Items']:
+            table.delete_item(Key={
+                "id":item["id"],
+                "location_id":item["location_id"]
+            })
         return {
             'statusCode': 200,
             'body': json.dumps(f"Item with ID {key_value} deleted successfully.")
