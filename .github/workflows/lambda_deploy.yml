@@ -61,7 +61,7 @@ jobs:
         run: |
           cd lambda/get_all_inventory_items/
           aws lambda update-function-code \
-            --function-name get_all_inventory_items \
+            --function-name sam-inventory-GetAllInventoryFunction-baieWW1QVt56 \
             --zip-file fileb://./get_all_inventory_items.zip \
             --publish
 
@@ -95,7 +95,7 @@ jobs:
         run: |
           cd lambda/get_inventory_item/
           aws lambda update-function-code \
-            --function-name get_inventory_item \
+            --function-name sam-inventory-GetInventoryFunction-2ZoL3M81b1JT \
             --zip-file fileb://./get_inventory_item.zip \
             --publish
 
@@ -129,7 +129,7 @@ jobs:
         run: |
           cd lambda/add_inventory_item/
           aws lambda update-function-code \
-            --function-name add_inventory_item \
+            --function-name sam-inventory-CreateInventoryFunction-d9MPi0oCHYcs \
             --zip-file fileb://./add_inventory_item.zip \
             --publish
 
@@ -163,7 +163,7 @@ jobs:
         run: |
           cd lambda/delete_inventory_item/
           aws lambda update-function-code \
-            --function-name delete_inventory_item \
+            --function-name sam-inventory-DeleteInventoryItemFunction-z4eDabEr8zS1 \
             --zip-file fileb://./delete_inventory_item.zip \
             --publish
 
@@ -197,7 +197,7 @@ jobs:
         run: |
           cd lambda/get_location_inventory_items/
           aws lambda update-function-code \
-            --function-name get_location_inventory_items \
+            --function-name sam-inventory-GetLocationInventoryFunction-WpzwVAgcf2Di \
             --zip-file fileb://./get_location_inventory_items.zip \
             --publish
 
