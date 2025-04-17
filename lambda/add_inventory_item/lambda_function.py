@@ -45,6 +45,22 @@ def lambda_handler(event, context):
             "body": json.dumps("Bad request. Invalid JSON format."),
         }
 
+    # Define allowed CORS headers
+    headers = {
+        "Access-Control-Allow-Origin": "*",  # Allow all origins
+        "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",  # Allowed HTTP methods
+        "Access-Control-Allow-Headers": "Content-Type"  # Allowed request headers
+    }
+
+    # Check if the request method is OPTIONS (CORS pre-flight request)
+    if event['httpMethod'] == 'OPTIONS':
+        # Return 200 response for OPTIONS requests with CORS headers
+        return {
+            'statusCode': 200,
+            'headers': headers,
+            'body': 'CORS pre-flight response'  # Optional body for pre-flight request
+        }
+
     # Get the table name from environment variable, otherwise use the default table name
     table_name = os.getenv("TABLE_NAME", "Inventory")
 
@@ -72,6 +88,7 @@ def lambda_handler(event, context):
         logger.info(f"Item {data['name']} with ID {unique_id} added successfully.")
         return {
             "statusCode": 200,
+            'headers': headers,
             "body": json.dumps(
                 f"Item {data['name']} with ID {unique_id} added successfully."
             ),
