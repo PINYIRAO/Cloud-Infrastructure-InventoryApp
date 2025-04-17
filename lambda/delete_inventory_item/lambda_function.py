@@ -17,6 +17,13 @@ def lambda_handler(event, context):
     path_params = event.get("pathParameters", {})
     key_value = path_params.get("id")
 
+    # Define allowed CORS headers
+    headers = {
+        "Access-Control-Allow-Origin": "*",  # Allow all origins
+        "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",  # Allowed HTTP methods
+        "Access-Control-Allow-Headers": "Content-Type"  # Allowed request headers
+    }
+
     if not key_value:
         return {
             "statusCode": 400,
@@ -25,22 +32,6 @@ def lambda_handler(event, context):
 
     try:
         response = table.query(KeyConditionExpression=Key("id").eq(key_value))
-        
-        # Define allowed CORS headers
-        headers = {
-            "Access-Control-Allow-Origin": "*",  # Allow all origins
-            "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",  # Allowed HTTP methods
-            "Access-Control-Allow-Headers": "Content-Type"  # Allowed request headers
-        }
-
-        # Check if the request method is OPTIONS (CORS pre-flight request)
-        if event['httpMethod'] == 'OPTIONS':
-            # Return 200 response for OPTIONS requests with CORS headers
-            return {
-                'statusCode': 200,
-                'headers': headers,
-                'body': 'CORS pre-flight response'  # Optional body for pre-flight request
-            }
     
         for item in response.get("Items", []):
             table.delete_item(
