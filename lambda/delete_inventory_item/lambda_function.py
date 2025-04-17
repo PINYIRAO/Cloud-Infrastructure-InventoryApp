@@ -60,5 +60,6 @@ def lambda_handler(event, context):
         print(e)
         return {
             "statusCode": 500,
+            'headers': headers,
             "body": json.dumps(f"Error deleting item: {str(e)}"),
         }
