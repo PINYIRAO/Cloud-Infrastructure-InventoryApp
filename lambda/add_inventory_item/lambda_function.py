@@ -12,7 +12,7 @@ logger = logging.getLogger()
 
 
 def lambda_handler(event, context):
-    # Parse incoming JSON data, this is a test modification
+    # Parse incoming JSON data, this is a test modification, change back
     try:
         # Ensure 'body' exists and parse it
         if "body" not in event:

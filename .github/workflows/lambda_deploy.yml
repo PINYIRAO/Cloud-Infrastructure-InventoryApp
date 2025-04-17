@@ -6,39 +6,11 @@ on:
     branches:
       - main
       - development
+    paths:
+      - "lambda/**/*"
 
 jobs:
-  check-changes:
-    runs-on: ubuntu-latest
-    outputs:
-      get_all_inventory_items: ${{ steps.filter.outputs.get_all_inventory_items }}
-      get_inventory_item: ${{ steps.filter.outputs.get_inventory_item }}
-      add_inventory_item: ${{ steps.filter.outputs.add_inventory_item }}
-      delete_inventory_item: ${{ steps.filter.outputs.delete_inventory_item }}
-      get_location_inventory_items: ${{ steps.filter.outputs.get_location_inventory_items }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Check which Lambda functions changed
-        id: filter
-        uses: dorny/paths-filter@v3
-        with:
-          filters: |
-            get_all_inventory_items:
-              - lambda/get_all_inventory_items/**
-            get_inventory_item:
-              - lambda/get_inventory_item/**
-            add_inventory_item:
-              - lambda/add_inventory_item/**
-            delete_inventory_item:
-              - lambda/delete_inventory_item/**
-            get_location_inventory_items:
-              - lambda/get_location_inventory_items/**
-
   deploy-get_all_inventory_items:
-    needs: check-changes
-    if: needs.check-changes.outputs.get_all_inventory_items == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -71,8 +43,6 @@ jobs:
           rm get_all_inventory_items.zip
 
   deploy-get_inventory_item:
-    needs: check-changes
-    if: needs.check-changes.outputs.get_inventory_item == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -105,8 +75,6 @@ jobs:
           rm get_inventory_item.zip
 
   deploy-add_inventory_item:
-    needs: check-changes
-    if: needs.check-changes.outputs.add_inventory_item == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -123,6 +91,7 @@ jobs:
       - name: Zip Lambda function
         run: |
           cd lambda/add_inventory_item/
+          pip install -r requirements.txt -t .
           zip -r add_inventory_item.zip .
 
       - name: Update Lambda function on AWS
@@ -139,8 +108,6 @@ jobs:
           rm add_inventory_item.zip
 
   deploy-delete_inventory_item:
-    needs: check-changes
-    if: needs.check-changes.outputs.delete_inventory_item == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -173,8 +140,6 @@ jobs:
           rm delete_inventory_item.zip
 
   deploy-get_location_inventory_items:
-    needs: check-changes
-    if: needs.check-changes.outputs.get_location_inventory_items == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
