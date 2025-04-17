@@ -91,6 +91,7 @@ jobs:
       - name: Zip Lambda function
         run: |
           cd lambda/add_inventory_item/
+          pip install -r requirements.txt -t .
           zip -r add_inventory_item.zip .
 
       - name: Update Lambda function on AWS
