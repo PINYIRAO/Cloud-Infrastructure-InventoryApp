@@ -38,21 +38,8 @@ jobs:
 
   deploy:
     needs: check-changes
+    if: needs.check-changes.outputs.get_all_inventory_items == 'true'
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        function:
-          - name: get_all_inventory_items
-            path: lambda/get_all_inventory_items
-          - name: get_inventory_item
-            path: lambda/get_inventory_item
-          - name: add_inventory_item
-            path: lambda/add_inventory_item
-          - name: delete_inventory_item
-            path: lambda/delete_inventory_item
-          - name: get_location_inventory_items
-            path: lambda/get_location_inventory_items
-    if: ${{ needs.check-changes.outputs[matrix.function.name] == 'true' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -67,18 +54,18 @@ jobs:
 
       - name: Zip Lambda function
         run: |
-          cd ${{ matrix.function.path }}
-          zip -r ../../${{ matrix.function.name }}.zip .
+          cd lambda/get_all_inventory_items/
+          zip -r get_all_inventory_items.zip .
 
       - name: Update Lambda function on AWS
         run: |
-          cd ${{ matrix.function.path }}
+          cd lambda/get_all_inventory_items/
           aws lambda update-function-code \
-            --function-name ${{ matrix.function.name }} \
-            --zip-file fileb://./${{ matrix.function.name }}.zip \
+            --function-name get_all_inventory_items \
+            --zip-file fileb://./get_all_inventory_items.zip \
             --publish
 
       - name: Cleanup zip file
         run: |
-          cd ${{ matrix.function.path }}
-          rm ${{ matrix.function.name }}.zip
+          cd lambda/get_all_inventory_items/
+          rm get_all_inventory_items.zip
