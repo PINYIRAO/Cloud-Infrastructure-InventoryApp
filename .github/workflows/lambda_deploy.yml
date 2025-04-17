@@ -36,7 +36,7 @@ jobs:
             get_location_inventory_items:
               - lambda/get_location_inventory_items/**
 
-  deploy:
+  deploy-get_all_inventory_items:
     needs: check-changes
     if: needs.check-changes.outputs.get_all_inventory_items == 'true'
     runs-on: ubuntu-latest
@@ -69,3 +69,139 @@ jobs:
         run: |
           cd lambda/get_all_inventory_items/
           rm get_all_inventory_items.zip
+
+  deploy-get_inventory_item:
+    needs: check-changes
+    if: needs.check-changes.outputs.get_inventory_item == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: us-east-1
+
+      - name: Zip Lambda function
+        run: |
+          cd lambda/get_inventory_item/
+          zip -r get_inventory_item.zip .
+
+      - name: Update Lambda function on AWS
+        run: |
+          cd lambda/get_inventory_item/
+          aws lambda update-function-code \
+            --function-name get_inventory_item \
+            --zip-file fileb://./get_inventory_item.zip \
+            --publish
+
+      - name: Cleanup zip file
+        run: |
+          cd lambda/get_inventory_item/
+          rm get_inventory_item.zip
+
+  deploy-add_inventory_item:
+    needs: check-changes
+    if: needs.check-changes.outputs.add_inventory_item == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: us-east-1
+
+      - name: Zip Lambda function
+        run: |
+          cd lambda/add_inventory_item/
+          zip -r add_inventory_item.zip .
+
+      - name: Update Lambda function on AWS
+        run: |
+          cd lambda/add_inventory_item/
+          aws lambda update-function-code \
+            --function-name add_inventory_item \
+            --zip-file fileb://./add_inventory_item.zip \
+            --publish
+
+      - name: Cleanup zip file
+        run: |
+          cd lambda/add_inventory_item/
+          rm add_inventory_item.zip
+
+  deploy-delete_inventory_item:
+    needs: check-changes
+    if: needs.check-changes.outputs.delete_inventory_item == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: us-east-1
+
+      - name: Zip Lambda function
+        run: |
+          cd lambda/delete_inventory_item/
+          zip -r delete_inventory_item.zip .
+
+      - name: Update Lambda function on AWS
+        run: |
+          cd lambda/delete_inventory_item/
+          aws lambda update-function-code \
+            --function-name delete_inventory_item \
+            --zip-file fileb://./delete_inventory_item.zip \
+            --publish
+
+      - name: Cleanup zip file
+        run: |
+          cd lambda/delete_inventory_item/
+          rm delete_inventory_item.zip
+
+  deploy-get_location_inventory_items:
+    needs: check-changes
+    if: needs.check-changes.outputs.get_location_inventory_items == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: us-east-1
+
+      - name: Zip Lambda function
+        run: |
+          cd lambda/get_location_inventory_items/
+          zip -r get_location_inventory_items.zip .
+
+      - name: Update Lambda function on AWS
+        run: |
+          cd lambda/get_location_inventory_items/
+          aws lambda update-function-code \
+            --function-name get_location_inventory_items \
+            --zip-file fileb://./get_location_inventory_items.zip \
+            --publish
+
+      - name: Cleanup zip file
+        run: |
+          cd lambda/get_location_inventory_items/
+          rm get_location_inventory_items.zip
