@@ -34,17 +34,17 @@
 
     <div class="form-container">
       <h2>Add New Item</h2>
-      <form id="addItemForm">
+      <form id="add-item-form">
         <label for="name">Name:</label>
         <input type="text" id="name" name="name" required /><br /><br />
         <label for="price">Price:</label>
         <input type="number" id="price" name="price" required /><br /><br />
         <label for="qty">Quantity:</label>
         <input type="number" id="qty" name="qty" required /><br /><br />
-        <label for="location_id">Location ID:</label>
+        <label for="location-id">Location ID:</label>
         <input
           type="number"
-          id="location_id"
+          id="location-id"
           name="location_id"
           required
         /><br /><br />
@@ -60,9 +60,9 @@
     </div>
 
     <h2>Inventory Items</h2>
-    <button id="loadItemsButton">Load Inventory Items</button>
+    <button id="load-items-button">Load Inventory Items</button>
 
-    <table id="inventoryTable">
+    <table id="inventory-table">
       <thead>
         <tr>
           <th>ID</th>
@@ -84,7 +84,7 @@
         "https://dwstmnku38.execute-api.us-east-1.amazonaws.com/dev/inventory";
       // Load inventory items from API Gateway
       document
-        .getElementById("loadItemsButton")
+        .getElementById("load-items-button")
         .addEventListener("click", function () {
           loadItems();
         });
@@ -106,7 +106,7 @@
       }
 
       function displayItems(items) {
-        const tableBody = document.querySelector("#inventoryTable tbody");
+        const tableBody = document.querySelector("#inventory-table tbody");
         tableBody.innerHTML = ""; // Clear existing rows
         items.forEach((item) => {
           const row = document.createElement("tr");
@@ -126,7 +126,7 @@
 
       // Add new item via API Gateway
       document
-        .getElementById("addItemForm")
+        .getElementById("add-item-form")
         .addEventListener("submit", function (event) {
           event.preventDefault();
 
@@ -154,7 +154,7 @@
               console.error("Error adding item:", error);
             });
 
-          document.getElementById("addItemForm").reset(); // Clear the form
+          document.getElementById("add-item-form").reset(); // Clear the form
         });
 
       // Delete item via API Gateway
